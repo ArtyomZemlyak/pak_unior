@@ -2,7 +2,6 @@
 """Class PlotDynamicUpdate, use for update data plots and initialize Unior
 module"""
 
-
 from collections import deque
 from numpy import array, sign, zeros
 import numpy as np
@@ -11,9 +10,8 @@ from scipy.interpolate import interp1d
 
 from WebPlot import WebPlot
 from Unior import Unior
+from ComConnect import ComConnect
 
-STD_SPEED = 57600  # Скорость COM порта
-COM_PORT = 'COM6'  # TODO: chose port to open
 EEG = 0
 NAMBER_OF_VALUES = 200
 LABELS = ['EEG', 'EEG_CURV', 'FURIE(EEG)', 'FURIE(EEG_CURV)',
@@ -37,9 +35,9 @@ class PlotDynamicUpdate:
                            maxlen=NAMBER_OF_VALUES)
         self.ydata = deque([0.0 for _ in range(0, NAMBER_OF_VALUES)],
                            maxlen=NAMBER_OF_VALUES)
-        self.x_a = deque([0.0 for _ in range(0, NAMBER_OF_VALUES)],
+        self.x_a = deque([0.1 * _ for _ in range(50, NAMBER_OF_VALUES)],
                          maxlen=NAMBER_OF_VALUES)
-        self.y_a = deque([0.0 for _ in range(0, NAMBER_OF_VALUES)],
+        self.y_a = deque([50 for _ in range(50, NAMBER_OF_VALUES)],
                          maxlen=NAMBER_OF_VALUES)
         print(' DONE |')
 
@@ -90,7 +88,7 @@ class PlotDynamicUpdate:
         ydata_curved = self.curve_on(self.ydata)
         source_list[1].data.update({"x": [v for i, v in
                                    enumerate(self.xdata) if i > 49],
-                             "y": [v for i, v in
+                                    "y": [v for i, v in
                                    enumerate(ydata_curved) if i > 49]})
 
         # FURIE(EEG)#############################################
@@ -118,16 +116,20 @@ class PlotDynamicUpdate:
 
         # ACTIVATE LINE######################################
         self.activate_value = np.mean(yf_m_curved) + 50
-        source_list[3].data.update({"x": xf_f,
-                             "y": self.activate_line_on_(xf_f,
-                                                         self.activate_value)})
+        source_list[3].data.update({
+            "x": xf_f,
+            "y": self.activate_line_on_(xf_f, self.activate_value)})
 
         # ALFA DIAPASON######################################
-        act_l = self.activate_line_on_(xf_f, 0, values=yf_m_curved)
-        source_list[4].data.update({"x": xf_f, "y": act_l})
-        self.x_a.append(self.xdata[-1])
-        self.y_a.append(int(np.average(act_l) * 10))
-        source_list[5].data.update({"x": self.x_a, "y": self.y_a})
+        if self.xdata[100] > 1:
+            act_l = self.activate_line_on_(xf_f, 0, values=yf_m_curved)
+            source_list[4].data.update({"x": xf_f, "y": act_l})
+            self.x_a.append(self.xdata[-1])
+            self.y_a.append(int(np.average(act_l) * 10))
+            source_list[5].data.update({"x": self.x_a, "y": self.y_a})
+            if self.x_a[-10] > 50:
+                source_list[10].data.update({"x": self.x_a,
+                                             "y": self.curve_on(self.y_a)})
 
         self.update_value = 0
 
@@ -135,7 +137,9 @@ class PlotDynamicUpdate:
         """Main"""
         print('INITIALIZE... | d()')
 
-        self._unior = Unior(EEG, COM_PORT, STD_SPEED)
+        self._unior = Unior(EEG)
+        self._comcn = ComConnect()
 
-        self._webplot = WebPlot(self, self._unior, NAMBER_OF_VALUES)
+        self._webplot = WebPlot(self, self._unior, self._comcn,
+                                NAMBER_OF_VALUES)
         self._webplot.start()

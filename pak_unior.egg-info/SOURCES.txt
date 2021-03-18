@@ -6,8 +6,10 @@ Unior.py
 WebPlot.py
 main.py
 pak_unior_stable_mpl.py
+requirements.txt
 setup.cfg
 setup.py
+dist/pak_unior-1.2.1.tar.gz
 docs/Makefile
 docs/make.bat
 docs/build/.buildinfo

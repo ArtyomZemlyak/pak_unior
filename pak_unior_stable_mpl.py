@@ -31,7 +31,7 @@ plt.ion()
 
 time_start = process_time()
 
-piSerial = serial.Serial()  # TODO: can be use self serial?
+piSerial = serial.Serial()
 print(f'S:- Port:{piSerial.is_open}')
 piSerial.close()
 print(f'S:- Port:{piSerial.is_open}')
@@ -64,7 +64,7 @@ def unior_begin(channel):
     return status
 
 
-def unior_read(channel):  # TODO: try fast serial read
+def unior_read(channel):
     """Read data from PAK UNIOR"""
     if piSerial.inWaiting() > 0:
         piSerial.flushInput()
@@ -142,7 +142,7 @@ class DynamicUpdate:
             y[j] = self.activate_value + 100
         return y
 
-    def on_launch(self):  # TODO: can we use stram from holoviz or plan?
+    def on_launch(self):
         """Set up plot"""
         for i, axe in enumerate(self.ax.ravel()):
             line, = axe.plot([], [], 'b-', label=LABELS[i])
