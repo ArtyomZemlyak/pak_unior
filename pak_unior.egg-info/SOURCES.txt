@@ -1,5 +1,6 @@
 AUTHORS
 ChangeLog
+ComConnect.py
 PlotDynamicUpdate.py
 README.rst
 Unior.py
@@ -73,6 +74,5 @@ pak_unior.egg-info/PKG-INFO
 pak_unior.egg-info/SOURCES.txt
 pak_unior.egg-info/dependency_links.txt
 pak_unior.egg-info/not-zip-safe
-pak_unior.egg-info/pbr.json
 pak_unior.egg-info/requires.txt
 pak_unior.egg-info/top_level.txt

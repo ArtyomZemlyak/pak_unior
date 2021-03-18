@@ -110,7 +110,6 @@ class ComConnect:
         for i in ports:
             s = ''
             for j in str(i):
-                print(f'PORTS| {j} |', end='')
                 if j != ' ':
                     s += j
                 else:
