@@ -1,0 +1,43 @@
+{% set name = "pak_unior" %}
+{% set version = "1.2.3" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: c0b8fe48dd4fdbc9052d93473431175c7aadf40817c42a47c4c6bc4813cf4bdd
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+
+requirements:
+  build:
+    - python
+    - setuptools
+    - conda
+    - pip
+    - pbr
+  host:
+    - pip
+    - python
+    - conda
+  run:
+    - python
+  script: conda create --name pak_unior_env --file spec-file.txt
+
+about:
+  home: The package home page
+  license: OSL
+  license_family: OTHER
+  license_file: 
+  summary: "PAK UNIOR web plot"
+  doc_url: https://pypi.python.org/pypi/pak_unior/
+  dev_url: https://github.com/ArtyomZemlyak/pak_unior
+
+extra:
+  recipe-maintainers:
+    - https://github.com/ArtyomZemlyak
