@@ -1,0 +1,76 @@
+AUTHORS
+ChangeLog
+PlotDynamicUpdate.py
+README.rst
+Unior.py
+WebPlot.py
+main.py
+pak_unior_stable_mpl.py
+setup.cfg
+setup.py
+docs/Makefile
+docs/make.bat
+docs/build/.buildinfo
+docs/build/genindex.html
+docs/build/index.html
+docs/build/objects.inv
+docs/build/py-modindex.html
+docs/build/search.html
+docs/build/searchindex.js
+docs/build/.doctrees/environment.pickle
+docs/build/.doctrees/index.doctree
+docs/build/.doctrees/generated/PlotDynamicUpdate — копия.doctree
+docs/build/.doctrees/generated/PlotDynamicUpdate.doctree
+docs/build/.doctrees/generated/Unior — копия (2).doctree
+docs/build/.doctrees/generated/Unior — копия.doctree
+docs/build/.doctrees/generated/Unior.doctree
+docs/build/.doctrees/generated/WebPlot — копия.doctree
+docs/build/.doctrees/generated/WebPlot.doctree
+docs/build/.doctrees/generated/main.doctree
+docs/build/.doctrees/generated/pak_unior_stable_mpl.doctree
+docs/build/_sources/index.rst.txt
+docs/build/_sources/generated/PlotDynamicUpdate — копия.rst.txt
+docs/build/_sources/generated/PlotDynamicUpdate.rst.txt
+docs/build/_sources/generated/Unior — копия (2).rst.txt
+docs/build/_sources/generated/Unior — копия.rst.txt
+docs/build/_sources/generated/Unior.rst.txt
+docs/build/_sources/generated/WebPlot — копия.rst.txt
+docs/build/_sources/generated/WebPlot.rst.txt
+docs/build/_sources/generated/main.rst.txt
+docs/build/_sources/generated/pak_unior_stable_mpl.rst.txt
+docs/build/_static/alabaster.css
+docs/build/_static/basic.css
+docs/build/_static/custom.css
+docs/build/_static/doctools.js
+docs/build/_static/documentation_options.js
+docs/build/_static/file.png
+docs/build/_static/jquery-3.5.1.js
+docs/build/_static/jquery.js
+docs/build/_static/language_data.js
+docs/build/_static/minus.png
+docs/build/_static/plus.png
+docs/build/_static/pygments.css
+docs/build/_static/searchtools.js
+docs/build/_static/underscore-1.12.0.js
+docs/build/_static/underscore.js
+docs/build/generated/PlotDynamicUpdate — копия.html
+docs/build/generated/PlotDynamicUpdate.html
+docs/build/generated/Unior — копия (2).html
+docs/build/generated/Unior — копия.html
+docs/build/generated/Unior.html
+docs/build/generated/WebPlot — копия.html
+docs/build/generated/WebPlot.html
+docs/build/generated/main.html
+docs/build/generated/pak_unior_stable_mpl.html
+docs/source/conf.py
+docs/source/index.rst
+docs/source/generated/PlotDynamicUpdate.rst
+docs/source/generated/Unior.rst
+docs/source/generated/WebPlot.rst
+pak_unior.egg-info/PKG-INFO
+pak_unior.egg-info/SOURCES.txt
+pak_unior.egg-info/dependency_links.txt
+pak_unior.egg-info/not-zip-safe
+pak_unior.egg-info/pbr.json
+pak_unior.egg-info/requires.txt
+pak_unior.egg-info/top_level.txt
