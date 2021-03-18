@@ -214,5 +214,6 @@ class WebPlot:
         return gspec
 
     def start(self):
+        """Starting WEB server bokeh"""
         print('INITIALIZE... | pn.serve(panel_app)')
         pn.serve(self.panel_app, title='PAK UNIOR EEG', port=40000)

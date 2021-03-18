@@ -1,9 +1,1 @@
-calibrate_new.py
-libgit2/
 __pycache__/
-*.py
-!pak_unior_stable_mpl.py
-!Unior.py
-!PlotDynamicUpdate.py
-!WebPlot.py
-!main.py

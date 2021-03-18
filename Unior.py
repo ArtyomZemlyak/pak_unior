@@ -74,9 +74,11 @@ class Unior:
             return 0
 
     def set_status(self, sts):
+        """Set status for reconnection or read data"""
         self.status = sts
         if self.status == 2:
             self.__init__(self.channel, self.com_port, self. std_speed)
 
     def close(self):
+        """Close COM port"""
         self.piSerial.close()
