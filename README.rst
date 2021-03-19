@@ -15,3 +15,7 @@ To install:
     python main.py
     
   3.2. Or use class PlotDenamicUpdate (check main.py) to initialize web server with program pak_unior.
+
+  3.3  Or use runner.exe file (also u can create link to this file on desktop).
+
+  But in this case you need install anaconda and env into default dir.
