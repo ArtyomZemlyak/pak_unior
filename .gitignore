@@ -1,2 +1,5 @@
 __pycache__/
 /pak_unior.egg-info/
+/.idea/
+/main.spec
+/setup2.py
