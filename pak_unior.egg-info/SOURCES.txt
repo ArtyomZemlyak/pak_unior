@@ -10,7 +10,6 @@ pak_unior_stable_mpl.py
 requirements.txt
 setup.cfg
 setup.py
-dist/pak_unior-1.2.1.tar.gz
 docs/Makefile
 docs/make.bat
 docs/build/.buildinfo
@@ -73,6 +72,4 @@ docs/source/generated/WebPlot.rst
 pak_unior.egg-info/PKG-INFO
 pak_unior.egg-info/SOURCES.txt
 pak_unior.egg-info/dependency_links.txt
-pak_unior.egg-info/not-zip-safe
-pak_unior.egg-info/requires.txt
 pak_unior.egg-info/top_level.txt
