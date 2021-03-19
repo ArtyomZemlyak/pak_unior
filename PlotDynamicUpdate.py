@@ -39,6 +39,7 @@ class PlotDynamicUpdate:
                          maxlen=NAMBER_OF_VALUES)
         self.y_a = deque([50 for _ in range(50, NAMBER_OF_VALUES)],
                          maxlen=NAMBER_OF_VALUES)
+        self.com_data = 0
         print(' DONE |')
 
     @staticmethod
@@ -127,6 +128,7 @@ class PlotDynamicUpdate:
             self.x_a.append(self.xdata[-1])
             self.y_a.append(int(np.average(act_l) * 10))
             source_list[5].data.update({"x": self.x_a, "y": self.y_a})
+            self.com_data = self.y_a[-1]
             if self.x_a[-10] > 50:
                 source_list[10].data.update({"x": self.x_a,
                                              "y": self.curve_on(self.y_a)})

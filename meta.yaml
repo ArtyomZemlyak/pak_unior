@@ -20,7 +20,7 @@ requirements:
     - setuptools
     - conda
     - pip
-    - pbr
+
   host:
     - pip
     - python
