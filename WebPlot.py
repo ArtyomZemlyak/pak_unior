@@ -15,13 +15,11 @@ from functools import partial
 from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure
 from bokeh.models.annotations import BoxAnnotation
-from bokeh.layouts import layout
 from bokeh.palettes import Spectral6
 from bokeh.models import HoverTool
 from bokeh.transform import linear_cmap
 from bokeh.models import Toggle
-from bokeh.models import Div, Dropdown
-from bokeh.models import CustomJS, Select
+from bokeh.models import Div
 
 
 class WebPlot:
@@ -37,6 +35,7 @@ class WebPlot:
         self.status_com = 0
         self._status_rec = 0
         self._ports = []
+        self.time_start = 0
         self._status_l = 'Whaiting to connect PAK UNIOR ...'
         self._status_com_l = "Whaiting to connect COM PORT..."
 
@@ -75,35 +74,6 @@ class WebPlot:
             print('CLOSING... | EXIT')
             sys.exit()
 
-        if self.status_com == 1:
-            if self._com.write(self._plot.com_data):
-                self._status_com_l = "<br><b>COM PORT:</b> {'ONLINE'}<br>" \
-                                     f"Write data to {self._com.com_port}"
-            else:
-                self.status_com = 0
-                self._status_com_l = "<br><b>COM PORT:</b> {'OFFLINE'}<br>" \
-                                     f"Conct to {self._com.com_port} failed"
-        else:
-            self._ports = self._unior.serial_ports()
-            if len(self._ports) > 0:
-                self.source_list[9].options = self._ports
-                if self.source_list[9].value in self._ports and \
-                   self.source_list[9].value != self.source_list[8].value:
-                    self._status_com_l = "<br><b>COM PORT:</b>" \
-                                         "{'OFFLINE'}<br>" \
-                                        f"Connect to {self._com.com_port}"
-                    self.status_com = self._com.begin(com_port=
-                                                      self.source_list[
-                                                          9].value)
-                else:
-                    print(f'VALUE COM:{self.source_list[9].value}')
-                    self._status_com_l = \
-                        f"<br>Choose COM PORT" + \
-                        f"<br>PORT:{self.source_list[9].value}" + \
-                        f"<br>Ports: {self.source_list[9].options}"
-            else:
-                self._status_com_l = "<br>PLUG IN DEVICE TO COM PORT"
-
         if self.status == 1:
             data_r = self._unior.read()
             if data_r != "NO CONN":
@@ -112,6 +82,7 @@ class WebPlot:
                 time_v = process_time()
                 while time_v == self._plot.xdata[-1]:
                     time_v = process_time()
+                time_v = time_v - self.time_start
 
                 self._plot._rpm += 1
                 if time_v - self._plot._time_rpm > 1:
@@ -178,6 +149,35 @@ class WebPlot:
                 self._status_l = "PLUG IN PAK UNIOR"
             sleep(0.5)
 
+        if self.status_com == 1:
+            if self._com.write(self._plot.com_data):
+                self._status_com_l = "<br><b>COM PORT:</b> {'ONLINE'}<br>" \
+                                     f"Write data to {self._com.com_port}"
+            else:
+                self.status_com = 0
+                self._status_com_l = "<br><b>COM PORT:</b> {'OFFLINE'}<br>" \
+                                     f"Conct to {self._com.com_port} failed"
+        else:
+            self._ports = self._unior.serial_ports()
+            if len(self._ports) > 0:
+                self.source_list[9].options = self._ports
+                if self.source_list[9].value in self._ports and \
+                   self.source_list[9].value != self.source_list[8].value:
+                    self._status_com_l = "<br><b>COM PORT:</b>" \
+                                         "{'OFFLINE'}<br>" \
+                                        f"Connect to {self._com.com_port}"
+                    self.status_com = self._com.begin(com_port=
+                                                      self.source_list[
+                                                          9].value)
+                else:
+                    print(f'VALUE COM:{self.source_list[9].value}')
+                    self._status_com_l = \
+                        f"<br>Choose COM PORT" + \
+                        f"<br>PORT:{self.source_list[9].value}" + \
+                        f"<br>Ports: {self.source_list[9].options}"
+            else:
+                self._status_com_l = "<br>PLUG IN DEVICE TO COM PORT"
+
     def panel_app(self):
         """Setting web plots and widgets"""
         pn.extension()
@@ -226,7 +226,11 @@ class WebPlot:
         c.vbar(x="x", width=0.5, bottom=0, top="y",
                line_color=mapper, color=mapper, source=self.source_list[2])
         c.line(x="x", y="y", source=self.source_list[3])
-        center = BoxAnnotation(top=600, bottom=0, left=8, right=14,
+        lft, rgt = self._plot.activate_diapason
+        int_range_slider = pn.widgets.IntRangeSlider(
+            name='Integer Range Slider',
+            start=0, end=30, value=(lft, rgt), step=1)
+        center = BoxAnnotation(top=600, bottom=0, left=lft, right=rgt,
                                fill_alpha=0.3, fill_color='navy')
         c.add_layout(center)
 
@@ -266,9 +270,12 @@ class WebPlot:
 
         self.source_list.append(ColumnDataSource({
             "x": self.gen_data(50),
-            "y": self.gen_data(50)}))
+            "y": self.gen_data(50)}))  # 10 index
         gfq.line(x="x", y="y", line_width = 3, legend="ALFA VAL CURV",
-                 color = "firebrick", source=self.source_list[10])
+                 color="firebrick", source=self.source_list[10])
+
+        self.source_list.append(int_range_slider)  # 11 index
+        self.source_list.append(center)  # 12 index
 
         print('INITIALIZE... | cb = pn.state.add_periodic_callback')
         cb = pn.state.add_periodic_callback(partial(self.update,
@@ -277,6 +284,7 @@ class WebPlot:
         gspec = pn.GridSpec(sizing_mode='stretch_both', max_height=900)
         gspec[0:5, 0:6] = p
         gspec[0:5, 6:10] = c
+        gspec[5:6, 6:10] = int_range_slider
         gspec[6:7, 0:1] = toggle1
         gspec[6:7, 1:2] = toggle2
         gspec[7:8, 0:1] = slct1
@@ -286,6 +294,7 @@ class WebPlot:
         gspec[6:10, 3:7] = gfq
         gspec[6:10, 7:10] = gfc
 
+        self.time_start = process_time()
         print(f'| THIS IS gspec:{gspec}|')
         return gspec
 

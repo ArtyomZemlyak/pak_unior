@@ -30,14 +30,14 @@ class PlotDynamicUpdate:
         self._rpm = 0
         self._time_rpm = 0
         self.activate_value = 400
-        self.activate_diapason = [9, 14]
+        self.activate_diapason = [8, 13]
         self.xdata = deque([0.0 for _ in range(0, NAMBER_OF_VALUES)],
                            maxlen=NAMBER_OF_VALUES)
         self.ydata = deque([0.0 for _ in range(0, NAMBER_OF_VALUES)],
                            maxlen=NAMBER_OF_VALUES)
-        self.x_a = deque([0.1 * _ for _ in range(50, NAMBER_OF_VALUES)],
+        self.x_a = deque([0.0 * _ for _ in range(50, NAMBER_OF_VALUES)],
                          maxlen=NAMBER_OF_VALUES)
-        self.y_a = deque([50 for _ in range(50, NAMBER_OF_VALUES)],
+        self.y_a = deque([0.0 for _ in range(50, NAMBER_OF_VALUES)],
                          maxlen=NAMBER_OF_VALUES)
         self.com_data = 0
         print(' DONE |')
@@ -85,53 +85,74 @@ class PlotDynamicUpdate:
 
     def on_running(self, source_list):
         """Update data (with the new _and_ the old points)"""
-        # EEG_CURVED######################################
-        ydata_curved = self.curve_on(self.ydata)
-        source_list[1].data.update({"x": [v for i, v in
-                                   enumerate(self.xdata) if i > 49],
-                                    "y": [v for i, v in
-                                   enumerate(ydata_curved) if i > 49]})
+        lft, rgt = source_list[11].value
+        self.activate_diapason[0] = lft
+        self.activate_diapason[1] = rgt
+        source_list[12].left = lft
+        source_list[12].right = rgt
+        if self.ydata[0] > 1:
+            # EEG_CURVED######################################
+            ydata_curved = self.curve_on(self.ydata)
+            source_list[1].data.update({"x": [v for i, v in
+                                       enumerate(self.xdata) if i > 49],
+                                        "y": [v for i, v in
+                                       enumerate(ydata_curved) if i > 49]})
 
-        # FURIE(EEG)#############################################
-        yf = rfft(self.ydata)
-        xf = rfftfreq(NAMBER_OF_VALUES, 1 / 60)
-        xf_f = [float("%.3f" % np.real(i)) for i in xf]
-        yf_f = [float("%.3f" % np.real(i)) for i in yf]
-        for k in range(0, 3):
-            yf_f[k] = 0
-        # FURIE(EEG_CURVED)######################################
-        yf2 = rfft(ydata_curved)
-        yf_f2 = [float("%.3f" % np.real(i)) for i in yf2]
-        for k in range(0, 3):
-            yf_f2[k] = 0
-        # (FURIE(EEG)_m_FURIE(EEG_CURVED))_CURVED###############
-        yf_m = []
-        for y1, y2 in zip(yf_f, yf_f2):
-            y_ = abs(y1) - abs(y2)
-            if y_ > 0:
-                yf_m.append(y_)
-            else:
-                yf_m.append(0.0)
-        yf_m_curved = np.abs(self.curve_on(yf_m))
-        source_list[2].data.update({"x": xf_f, "y": yf_m_curved})
+            # FURIE(EEG)#############################################
+            yf = rfft(self.ydata)
+            xf = rfftfreq(NAMBER_OF_VALUES, 1 / 60)
+            xf_f = [float("%.3f" % np.real(i)) for i in xf]
+            yf_f = [float("%.3f" % np.real(i)) for i in yf]
+            for k in range(0, 3):
+                yf_f[k] = 0
+            # FURIE(EEG_CURVED)######################################
+            yf2 = rfft(ydata_curved)
+            yf_f2 = [float("%.3f" % np.real(i)) for i in yf2]
+            for k in range(0, 3):
+                yf_f2[k] = 0
+            # (FURIE(EEG)_m_FURIE(EEG_CURVED))_CURVED###############
+            yf_m = []
+            for y1, y2 in zip(yf_f, yf_f2):
+                y_ = abs(y1) - abs(y2)
+                if y_ > 0:
+                    yf_m.append(y_)
+                else:
+                    yf_m.append(0.0)
+            yf_m_curved = np.abs(self.curve_on(yf_m))
+            source_list[2].data.update({"x": xf_f, "y": yf_m_curved})
 
-        # ACTIVATE LINE######################################
-        self.activate_value = np.mean(yf_m_curved) + 50
-        source_list[3].data.update({
-            "x": xf_f,
-            "y": self.activate_line_on_(xf_f, self.activate_value)})
+            # ACTIVATE LINE######################################
+            self.activate_value = np.mean(yf_m_curved) + 50
+            source_list[3].data.update({
+                "x": xf_f,
+                "y": self.activate_line_on_(xf_f, self.activate_value)})
 
-        # ALFA DIAPASON######################################
-        if self.xdata[100] > 1:
+            # ALFA DIAPASON######################################
             act_l = self.activate_line_on_(xf_f, 0, values=yf_m_curved)
             source_list[4].data.update({"x": xf_f, "y": act_l})
             self.x_a.append(self.xdata[-1])
             self.y_a.append(int(np.average(act_l) * 10))
             source_list[5].data.update({"x": self.x_a, "y": self.y_a})
-            self.com_data = self.y_a[-1]
-            if self.x_a[-10] > 50:
+
+            if self.y_a[0] == 0:
+                y_a_p = []
+                y_a_n = []
+                for i in self.y_a:
+                    if i > 0:
+                        y_a_p.append(i)
+                    else:
+                        y_a_n.append(i)
+                y_a_all = [i for i in y_a_n]
+                for i in self.curve_on(y_a_p):
+                    y_a_all.append(i)
                 source_list[10].data.update({"x": self.x_a,
-                                             "y": self.curve_on(self.y_a)})
+                                             "y": y_a_all})
+                self.com_data = y_a_all[-1]
+            else:
+                y_a_all = self.curve_on(self.y_a)
+                source_list[10].data.update({"x": self.x_a,
+                                             "y": y_a_all})
+                self.com_data = y_a_all[-1]
 
         self.update_value = 0
 
