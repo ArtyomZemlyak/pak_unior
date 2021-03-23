@@ -1,5 +1,5 @@
 {% set name = "pak_unior" %}
-{% set version = "1.2.8" %}
+{% set version = "1.2.9" %}
 
 package:
   name: "{{ name|lower }}"
@@ -11,7 +11,8 @@ source:
 
 build:
   number: 0
-  script: conda env create -f environment.yml
+  script: python setup_env.py
+          conda env create -f environment.yml
 
 about:
   home: The package home page

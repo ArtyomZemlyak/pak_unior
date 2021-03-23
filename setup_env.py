@@ -1,3 +1,5 @@
+file = open("environment.yml", "w")
+setup_env = r"""
 name: pak_unior_test
 channels:
   - pyviz
@@ -350,3 +352,6 @@ dependencies:
     - numpy==1.19.2
     - pak-unior==1.2.9
 prefix: C:\ProgramData\Anaconda3\envs\pak_unior_test
+"""
+file.write(setup_env)
+file.close()
