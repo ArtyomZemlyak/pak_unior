@@ -8,8 +8,10 @@ WebPlot.py
 main.py
 pak_unior_stable_mpl.py
 requirements.txt
+runner.py
 setup.cfg
 setup.py
+setup_env.py
 docs/Makefile
 docs/make.bat
 docs/build/.buildinfo
