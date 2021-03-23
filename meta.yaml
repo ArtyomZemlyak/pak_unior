@@ -1,5 +1,5 @@
 {% set name = "pak_unior" %}
-{% set version = "1.2.5" %}
+{% set version = "1.2.6" %}
 
 package:
   name: "{{ name|lower }}"
@@ -11,23 +11,7 @@ source:
 
 build:
   number: 0
-  script: "{{ PYTHON }} -m pip install . -vv"
-
-
-requirements:
-  build:
-    - python
-    - setuptools
-    - conda
-    - pip
-
-  host:
-    - pip
-    - python
-    - conda
-  run:
-    - python
-  script: conda create --name pak_unior_env --file spec-file.txt
+  script: "conda env create -f environment.yml"
 
 about:
   home: The package home page

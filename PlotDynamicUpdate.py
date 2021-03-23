@@ -39,6 +39,8 @@ class PlotDynamicUpdate:
                          maxlen=NAMBER_OF_VALUES)
         self.y_a = deque([0.0 for _ in range(50, NAMBER_OF_VALUES)],
                          maxlen=NAMBER_OF_VALUES)
+        self.ydata_curved = deque([0.0 for _ in range(50, NAMBER_OF_VALUES)],
+                                  maxlen=NAMBER_OF_VALUES)
         self.com_data = 0
         print(' DONE |')
 
@@ -65,6 +67,16 @@ class PlotDynamicUpdate:
         except ValueError:
             return data
 
+    @staticmethod
+    def mean_on(data, interval=3):
+        """Mean on intervals in array of smth values"""
+        data_mean = []
+        if interval % 2 == 1:
+            interval += 1
+        for i in range(interval):
+            data_mean.append(data[-1-i])
+        return np.average(data_mean)
+
     def activate_line_on_(self, data, value, values=[0, 1]):
         """Set up line of barier of alfa ritms"""
         y = [value for _ in data]
@@ -85,19 +97,16 @@ class PlotDynamicUpdate:
 
     def on_running(self, source_list):
         """Update data (with the new _and_ the old points)"""
-        lft, rgt = source_list[11].value
-        self.activate_diapason[0] = lft
-        self.activate_diapason[1] = rgt
-        source_list[12].left = lft
-        source_list[12].right = rgt
-        if self.ydata[0] > 1:
+        self.key += 1
+        if self.ydata[100] > 1 and self.key > 5:
+            self.key = 0
+            self.update_value = 1
             # EEG_CURVED######################################
-            ydata_curved = self.curve_on(self.ydata)
-            source_list[1].data.update({"x": [v for i, v in
-                                       enumerate(self.xdata) if i > 49],
-                                        "y": [v for i, v in
-                                       enumerate(ydata_curved) if i > 49]})
-
+            self.ydata_curved = self.curve_on(self.ydata)
+            source_list[1].data.update(
+                {"x": [v for i, v in enumerate(self.xdata) if i > 49],
+                 "y": [v for i, v in enumerate(self.ydata_curved) if
+                       i > 49]})
             # FURIE(EEG)#############################################
             yf = rfft(self.ydata)
             xf = rfftfreq(NAMBER_OF_VALUES, 1 / 60)
@@ -106,13 +115,13 @@ class PlotDynamicUpdate:
             for k in range(0, 3):
                 yf_f[k] = 0
             # FURIE(EEG_CURVED)######################################
-            yf2 = rfft(ydata_curved)
+            yf2 = rfft(self.ydata_curved)
             yf_f2 = [float("%.3f" % np.real(i)) for i in yf2]
             for k in range(0, 3):
                 yf_f2[k] = 0
             # (FURIE(EEG)_m_FURIE(EEG_CURVED))_CURVED###############
             yf_m = []
-            for y1, y2 in zip(yf_f, yf_f2):
+            for y1, y2 in zip(self.curve_on(yf_f), yf_f2):
                 y_ = abs(y1) - abs(y2)
                 if y_ > 0:
                     yf_m.append(y_)
@@ -127,13 +136,20 @@ class PlotDynamicUpdate:
                 "x": xf_f,
                 "y": self.activate_line_on_(xf_f, self.activate_value)})
 
-            # ALFA DIAPASON######################################
+            # ALFA DIAPASON GRID ######################################
             act_l = self.activate_line_on_(xf_f, 0, values=yf_m_curved)
             source_list[4].data.update({"x": xf_f, "y": act_l})
+            # ALFA DIAPASON PLOT ######################################
             self.x_a.append(self.xdata[-1])
-            self.y_a.append(int(np.average(act_l) * 10))
+            y_a_val = int(np.average(act_l) * 10) - self.activate_value
+            if y_a_val < 0:
+                self.y_a.append(0)
+            else:
+                self.y_a.append(y_a_val)
+            self.y_a[-5] = self.mean_on(self.y_a, 9)
             source_list[5].data.update({"x": self.x_a, "y": self.y_a})
 
+            # self.com_data = self.y_a[-3]
             if self.y_a[0] == 0:
                 y_a_p = []
                 y_a_n = []
@@ -147,12 +163,12 @@ class PlotDynamicUpdate:
                     y_a_all.append(i)
                 source_list[10].data.update({"x": self.x_a,
                                              "y": y_a_all})
-                self.com_data = y_a_all[-1]
+                self.com_data = y_a_all[-6]
             else:
                 y_a_all = self.curve_on(self.y_a)
                 source_list[10].data.update({"x": self.x_a,
                                              "y": y_a_all})
-                self.com_data = y_a_all[-1]
+                self.com_data = y_a_all[-6]
 
         self.update_value = 0
 

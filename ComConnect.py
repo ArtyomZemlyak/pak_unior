@@ -18,6 +18,8 @@ class ComConnect:
         self.com_port = com_port
         self. std_speed = std_speed
         self.status = 2
+        self._time_response = 0
+        self._ports = []
         self.piSerial = serial.Serial()
         self.piSerial.close()
         print(' DONE |')
@@ -98,26 +100,19 @@ class ComConnect:
             self.status = 2
             return "NO CONN"
 
-    @staticmethod
-    def serial_ports():
+    def serial_ports(self):
         """ Lists serial port names"""
-        print(f'LISTENNING PORTS...')
-        print(f'CHECKING PORTS...', end='')
         ports = serial.tools.list_ports.comports()
-        print(f'DONE |')
-        print(f'PORTS| {ports} |')
-        a = []
+        self._ports = []
         for i in ports:
             s = ''
             for j in str(i):
                 if j != ' ':
                     s += j
                 else:
-                    a.append(s)
+                    self._ports.append(s)
                     break
-        print(f'PORTS str| {a} |')
-
-        return a
+        return self._ports
 
     def set_status(self, sts):
         """Set status for reconnection or read data"""

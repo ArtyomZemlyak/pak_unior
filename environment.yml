@@ -348,5 +348,5 @@ dependencies:
   - pip:
     - keyboard==0.13.5
     - numpy==1.19.2
-    - pak-unior==1.2.5
+    - pak-unior==1.2.6
 prefix: C:\ProgramData\Anaconda3\envs\pak_unior_test

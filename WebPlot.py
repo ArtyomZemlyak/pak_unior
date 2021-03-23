@@ -4,7 +4,7 @@ Bokeh WEB"""
 
 import random
 import sys
-from time import sleep, process_time
+from time import process_time
 import keyboard
 import panel as pn
 import numpy as np
@@ -40,10 +40,12 @@ class WebPlot:
         self._status_com_l = "Whaiting to connect COM PORT..."
 
     def gen_data(self, start_v):
+        """Gen template data for sources"""
         return deque([0.1 for _ in range(start_v, self._NAMBER_OF_VALUES)],
                      maxlen=self._NAMBER_OF_VALUES)
 
     def source_init(self):
+        """Initialize main sources of data to WEB ploting"""
         self.source_list.append(ColumnDataSource({
             "x": self.gen_data(0),
             "y": self.gen_data(0)}))
@@ -67,7 +69,6 @@ class WebPlot:
 
     def update(self, source_list):
         """LOOP updaiting values of plots and read data"""
-
         if keyboard.is_pressed('q'):
             self._com.close()
             self._unior.close()
@@ -106,14 +107,7 @@ class WebPlot:
                 self._plot.xdata.append(time_v)
                 self._plot.ydata.append(data_r)
 
-                if self._plot.key == int(self._NAMBER_OF_VALUES / 10):
-                    self._plot.key = 0
-                    self._plot.update_value = 1
-                    self._plot.on_running(source_list)
-                self._plot.key = self._plot.key + 1
-
-                print(f'TIME:{self._plot.xdata[-1]}'
-                      f'VAL:{self._plot.ydata[-1]}')
+                self._plot.on_running(source_list)
 
                 source_list[0].data.update({"x": self._plot.xdata,
                                             "y": self._plot.ydata})
@@ -134,20 +128,26 @@ class WebPlot:
                            """
             self._ports = self._unior.serial_ports()
             if len(self._ports) > 0:
+                self.source_list[11].disabled = True
                 self.source_list[8].options = self._ports
                 if self.source_list[8].value in self._ports:
                     self._status_l = "Whaiting to connect PAK UNIOR"
                     self.status = self._unior.begin(com_port=
                                                     self.source_list[8].value)
                 else:
-                    print(f'VALUE COM:{self.source_list[8].value}')
                     self._status_l = \
                         f"Choose COM PORT" + \
                         f"<br>PORT:{self.source_list[8].value}" + \
                         f"<br>Ports: {self.source_list[8].options}"
             else:
+                lft, rgt = self.source_list[11].value
+                self.source_list[12].left = lft
+                self.source_list[12].right = rgt
+                self._plot.activate_diapason[0] = lft
+                self._plot.activate_diapason[1] = rgt
                 self._status_l = "PLUG IN PAK UNIOR"
-            sleep(0.5)
+                self.status == 0
+                self.source_list[11].disabled = False
 
         if self.status_com == 1:
             if self._com.write(self._plot.com_data):
@@ -158,7 +158,6 @@ class WebPlot:
                 self._status_com_l = "<br><b>COM PORT:</b> {'OFFLINE'}<br>" \
                                      f"Conct to {self._com.com_port} failed"
         else:
-            self._ports = self._unior.serial_ports()
             if len(self._ports) > 0:
                 self.source_list[9].options = self._ports
                 if self.source_list[9].value in self._ports and \
@@ -170,7 +169,6 @@ class WebPlot:
                                                       self.source_list[
                                                           9].value)
                 else:
-                    print(f'VALUE COM:{self.source_list[9].value}')
                     self._status_com_l = \
                         f"<br>Choose COM PORT" + \
                         f"<br>PORT:{self.source_list[9].value}" + \
@@ -200,7 +198,7 @@ class WebPlot:
             mode='vline'
         )
 
-        p = figure(title='EEG INPUT | EEG CURVED')
+        p = figure(title='EEG INPUT | EEG CURVED', output_backend="webgl")
         p.xaxis.axis_label = "TIME"
         p.yaxis.axis_label = "EEG VALUE"
         p.title.text_font_size = "20px"
@@ -217,7 +215,7 @@ class WebPlot:
                          button_type="success", active=True)
         toggle2.js_link('active', input_eeg, 'visible')
 
-        c = figure(title='FURIE(EEG) -> RITMS')
+        c = figure(title='FURIE(EEG) -> RITMS', output_backend="webgl")
         c.title.text_font_size = "20px"
         c.xaxis.axis_label = "Hz"
         c.yaxis.axis_label = "Hz RITM VALUE"
@@ -227,28 +225,27 @@ class WebPlot:
                line_color=mapper, color=mapper, source=self.source_list[2])
         c.line(x="x", y="y", source=self.source_list[3])
         lft, rgt = self._plot.activate_diapason
-        int_range_slider = pn.widgets.IntRangeSlider(
-            name='Integer Range Slider',
-            start=0, end=30, value=(lft, rgt), step=1)
         center = BoxAnnotation(top=600, bottom=0, left=lft, right=rgt,
                                fill_alpha=0.3, fill_color='navy')
+        sld = pn.widgets.IntRangeSlider(value=(lft, rgt), start=0, end=30,
+                                        name='DIAPASON')
         c.add_layout(center)
 
-        rpm_b = figure(title='RPM INPUT')
+        rpm_b = figure(title='RPM INPUT', output_backend="webgl")
         mapper2 = linear_cmap(field_name='y',
                               palette=Spectral6, low=0, high=100)
         rpm_b.vbar(x="x", bottom=0, top="y",
                    line_color=mapper2, color=mapper2,
                    source=self.source_list[6])
 
-        gfq = figure(title='ALFA RITM')
+        gfq = figure(title='ALFA RITM', output_backend="webgl")
         gfq.title.text_font_size = "20px"
         gfq.xaxis.axis_label = "TIME"
         gfq.yaxis.axis_label = "ALFA RITM VALUE"
         gfq.add_tools(ht)
         gfq.line(x="x", y="y", legend="ALFA VAL", source=self.source_list[5])
 
-        gfc = figure(title='ALFA RITM IN MOMENT')
+        gfc = figure(title='ALFA RITM IN MOMENT', output_backend="webgl")
         gfc.title.text_font_size = "20px"
         gfc.xaxis.axis_label = "Hz"
         gfc.yaxis.axis_label = "ALFA RITM VALUE"
@@ -271,20 +268,23 @@ class WebPlot:
         self.source_list.append(ColumnDataSource({
             "x": self.gen_data(50),
             "y": self.gen_data(50)}))  # 10 index
-        gfq.line(x="x", y="y", line_width = 3, legend="ALFA VAL CURV",
+        gfq.line(x="x", y="y", line_width=3, legend="ALFA VAL CURV",
                  color="firebrick", source=self.source_list[10])
 
-        self.source_list.append(int_range_slider)  # 11 index
+        self.source_list.append(sld)  # 11 index
         self.source_list.append(center)  # 12 index
 
         print('INITIALIZE... | cb = pn.state.add_periodic_callback')
+
         cb = pn.state.add_periodic_callback(partial(self.update,
                                                     self.source_list
                                                     ), 10)
+
         gspec = pn.GridSpec(sizing_mode='stretch_both', max_height=900)
         gspec[0:5, 0:6] = p
         gspec[0:5, 6:10] = c
-        gspec[5:6, 6:10] = int_range_slider
+        gspec[5:6, 6:10] = sld
+        # gspec[5:6, 9:10] = watcher
         gspec[6:7, 0:1] = toggle1
         gspec[6:7, 1:2] = toggle2
         gspec[7:8, 0:1] = slct1
