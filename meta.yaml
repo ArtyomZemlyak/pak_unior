@@ -1,5 +1,5 @@
 {% set name = "pak_unior" %}
-{% set version = "1.2.6" %}
+{% set version = "1.2.7" %}
 
 package:
   name: "{{ name|lower }}"
@@ -7,11 +7,11 @@ package:
 
 source:
   url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
-  sha256: 11ae3b503d704bbe8f7995c2195d3ff7a9ff25e7479e10fba0758e48093e41f3
+  sha256: 58872309030b87c39ea703076f0af0adb79e37945a7781de032dea00485c170b
 
 build:
   number: 0
-  script: "conda env create -f environment.yml"
+  script: conda env create -f environment.yml
 
 about:
   home: The package home page
